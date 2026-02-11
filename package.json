@@ -4,13 +4,11 @@
   "description": "DeepLX Proxy for Roblox Chat",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js"
   },
   "dependencies": {
     "axios": "^1.6.2",
-    "express": "^4.18.2",
-    "express-rate-limit": "^7.1.5"
+    "express": "^4.18.2"
   },
   "engines": {
     "node": ">=14.0.0"
