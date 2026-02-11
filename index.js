@@ -1,56 +1,58 @@
 const express = require('express');
 const axios = require('axios');
+const rateLimit = require('express-rate-limit'); // You need to add this to package.json
 const app = express();
 
-// Render uses the PORT environment variable automatically
 const PORT = process.env.PORT || 3000;
+
+// Rate Limiter Config: Max 60 requests per minute
+const limiter = rateLimit({
+    windowMs: 1 * 60 * 1000, // 1 minute
+    max: 60, 
+    message: { code: 429, message: "Too many translation requests. Slow down!" },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
 
 app.use(express.json());
 
-// Main Translation Route
+// Apply limiter only to the translate route
+app.use('/translate', limiter);
+
 app.post('/translate', async (req, res) => {
     const { text, source_lang, target_lang } = req.body;
 
     if (!text || !target_lang) {
         return res.status(400).json({ 
             code: 400, 
-            message: "Bad Request: text and target_lang are required." 
+            message: "Missing text or target_lang" 
         });
     }
 
     try {
-        // Using a reliable DeepLX node with a 5-second timeout
         const response = await axios.post('https://deeplx.owo.network/translate', {
             text: text,
             source_lang: source_lang || "auto",
             target_lang: target_lang
         }, { timeout: 5000 });
 
-        if (response.data && response.data.data) {
-            res.json({
-                code: 200,
-                data: response.data.data,
-                source: response.data.source_lang || source_lang
-            });
-        } else {
-            throw new Error("Invalid response from DeepLX engine");
-        }
+        res.json({
+            code: 200,
+            data: response.data.data
+        });
 
     } catch (error) {
         console.error("Translation Error:", error.message);
-        
-        // Fallback: Send original text if translation fails so the chat doesn't break
         res.status(500).json({ 
             code: 500, 
-            data: text, 
-            message: "Translation engine error, returning original text." 
+            data: text, // Fallback to original text
+            message: "Engine error" 
         });
     }
 });
 
-// Root route for Render health checks
 app.get('/', (req, res) => {
-    res.status(200).send("DeepLX Translator is Online at https://deeplx-translator.onrender.com 🚀");
+    res.send("DeepLX Translator + Rate Limiter is Online! 🚀");
 });
 
 app.listen(PORT, () => {
