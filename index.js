@@ -37,7 +37,7 @@ app.post('/', async (req, res) => {
 
 -- Handle GET requests at ROOT (/) so it shows online in browser
 app.get('/', (req, res) => {
-    res.send('DeepLX Translator is Online at Root');
+    res.send('DeepLX Translator is Online');
 });
 
 app.listen(PORT, () => console.log(`Translator listening on ${PORT}`));
