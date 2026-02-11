@@ -3,12 +3,10 @@ const axios = require('axios');
 const app = express();
 const PORT = process.env.PORT || 8080;
 
--- Authorization Token
 const AUTH_TOKEN = "Translator";
 
 app.use(express.json());
 
--- Handle POST requests at the ROOT (/)
 app.post('/', async (req, res) => {
     const { text, source_lang, target_lang } = req.body;
     const authHeader = req.headers['authorization'];
@@ -18,8 +16,7 @@ app.post('/', async (req, res) => {
     }
 
     try {
-        -- Fixed: Using the public free DeepLX API as the actual backend worker
-        const response = await axios.post('https://deeplx.inquizarus.com/translate', {
+        const response = await axios.post('https://deeplx-translator.onrender.com/', {
             text: text,
             source_lang: source_lang || "auto",
             target_lang: target_lang
@@ -35,7 +32,6 @@ app.post('/', async (req, res) => {
     }
 });
 
--- Handle GET requests at ROOT (/) so it shows online in browser
 app.get('/', (req, res) => {
     res.send('DeepLX Translator is Online');
 });
