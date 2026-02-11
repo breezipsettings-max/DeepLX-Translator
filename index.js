@@ -18,8 +18,8 @@ app.post('/', async (req, res) => {
     }
 
     try {
-        -- Using a reliable backend to actually get the translation
-        const response = await axios.post('https://deeplx-translator.onrender.com', {
+        -- Fixed: Using the public free DeepLX API as the actual backend worker
+        const response = await axios.post('https://deeplx.inquizarus.com/translate', {
             text: text,
             source_lang: source_lang || "auto",
             target_lang: target_lang
